@@ -1,7 +1,6 @@
 import './common/dotenv.js';
 import * as readline from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
-// import { connect } from 'node:http2'; 이거 뭐임?
 
 import instance from './instance.js';
 import MariaTestModel from './models/test.mysql.js';
@@ -12,7 +11,6 @@ function processEndCheck(x) {
   if (x === '') {
     instance.logger.info('process exit.');
     rl.close;
-    process.exit();
   }
 }
 
@@ -51,7 +49,7 @@ const database = async () => {
     const insertId = { id: await mysqlTestModel.insertAsync(conncet, { testcol: insertValue }) }; // insertAsync 메서드 실행시키고 { id: * } 형태에 오브젝트에 넣음.
     const insertResult = await mysqlTestModel.findByFilterAsync(conncet, insertId); // 이거 한 줄로 줄일 수 없는지 확인하기. 윗 줄의 함수받아와서 insert한 목록 보여줌.
     instance.logger.info(JSON.stringify(insertResult));
-  } else if (answer === 'selcet') {
+  } else if (answer === 'select') {
     // 분기-1 select면 query 문법을 받아서 SELECT 실행.
     const selectQuery = await rl.question('\nplease enter query\nSELECT * FROM testtable WHERE ');
     processEndCheck(selectQuery);
@@ -62,31 +60,31 @@ const database = async () => {
     // 분기-1 filter면 id 받아서 검색.
     const filteranswer = await rl.question('\nplease enter id what you want search ');
     processEndCheck(filteranswer);
-    parseInt(filteranswer);
-    /**여기 버그남. 모든 입력을 숫자가 아니라고 인식. */
-    if (typeof filteranswer !== Number) {
-      //입력 타입 조심
-      instance.logger.error('answer must be Number');
-      process.exit();
-    } else {
-      const fliterResult = await mysqlTestModel.countByFilterAsync(conncet, { id: filteranswer });
-      instance.logger.info(JSON.stringify(fliterResult));
-    }
-  } else if (answer === 'updata') {
+    const filterResult = await mysqlTestModel.countByFilterAsync(conncet, { id: filteranswer });
+    instance.logger.info(JSON.stringify(filterResult));
+  } else if (answer === 'update') {
     // 분기-1 updata면 id랑 text받아서 updata하기.
-    const updataId = await rl.question('\nplease enter updata id ');
+    const updataId = await rl.question('\nplease enter update filter ');
     processEndCheck(updataId);
-    const updataText = await rl.question('\nplease enter updata text ');
+    const updataText = await rl.question('\nplease enter update text ');
     processEndCheck(updataText);
     const updataBoolean = await mysqlTestModel.updateByFilterAsync(conncet, { id: updataId }, { testcol: updataText });
     if (updataBoolean === true) {
       const updataResult = await mysqlTestModel.queryAsync(conncet, `SELECT * FROM testtable WHERE id = ${updataId}`);
       instance.logger.info(JSON.stringify(updataResult));
-    } else instance.logger.error('error: false updata database');
+    } else instance.logger.error('error: id must be Number'); // 이거 오류 메세지 id가 숫자가 아님이랑 대상 id를 가진 값이 존재하지 않습니다. 둘로 나눠야 함
+  } else if (answer === 'delete') {
+    // 분기-1 delete
+    const deleteId = await rl.question('\nplease enter delete id ');
+    processEndCheck(deleteId);
+    const deleteBoolean = await mysqlTestModel.deleteByFilterAsync(conncet, { id: deleteId });
+    if (deleteBoolean === true) {
+      const deleteResult = await mysqlTestModel.queryAsync(conncet, `SELECT * FROM testtable`);
+      instance.logger.info(JSON.stringify(deleteResult));
+    } else instance.logger.error('error: id must be Number'); // 이거 오류 메세지 id가 숫자가 아님이랑 대상 id를 가진 값이 존재하지 않습니다. 둘로 나눠야 함
   } else {
     // 분기-1 text가 ISUD가 아니면 오류 출력.
-    instance.logger.error(`text error: wrong text`);
-    process.exit();
+    instance.logger.error(`text error: answer is not a IUSD`);
   }
   // const end = await mysqlTestModel.queryAsync(conncet, 'SELECT * FROM testtable'); // 전체 리스트 가져오기
   // instance.logger.info(JSON.stringify(end));
