@@ -115,29 +115,25 @@ const database = async () => {
       }
 
       case 'update': {
-        const getUpdateIdText = await rl.question('\nplease enter update Id filter and text ');
+        const getUpdataId = await rl.question('\nplease enter update Id filter ');
+        const getUpdateText = await rl.question('\nplease enter update text ');
 
-        const upDateIdAndText = getUpdateIdText.split(' '); // 오류 날 확률 높음
-
-        if (!Number.isInteger(Number(upDateIdAndText[0]))) {
+        if (!Number.isInteger(Number(getUpdataId))) {
           instance.logger.error('error: id must be Number');
           break;
         }
 
-        const updateIdFilter = { id: upDateIdAndText[0] };
-        const updateTextData = { testcol: upDateIdAndText[1] };
+        const updateIdFilter = { id: getUpdataId };
+        const updateTextData = { testcol: getUpdateText };
 
-        const checkUpdateId = await mysqlTestModel.countByFilterAsync(conncet, updateIdFilter);
+        const UpdateBoolean = await mysqlTestModel.updateByFilterAsync(conncet, updateIdFilter, updateTextData);
 
-        if (checkUpdateId === 0) {
-          instance.logger.error(`error: that id not exist in ${mysqlTestModel.tableName}`);
-          break;
+        if (UpdateBoolean === 'true') {
+          const updataResult = await mysqlTestModel.findByFilterAsync(conncet, updateIdFilter); // 요걸 생략할 순 없을까?
+          instance.logger.info(JSON.stringify(updataResult));
+        } else {
+          instance.logger.error(`error: false query enter`);
         }
-
-        await mysqlTestModel.updateByFilterAsync(conncet, updateIdFilter, updateTextData);
-        const updataResult = await mysqlTestModel.findByFilterAsync(conncet, updateIdFilter); // 요걸 생략할 순 없을까?
-
-        instance.logger.info(JSON.stringify(updataResult));
 
         break;
       }
