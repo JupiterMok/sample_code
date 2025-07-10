@@ -1,6 +1,7 @@
 import './common/dotenv.js';
 import * as readline from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
+import { join } from 'node:path';
 
 import instance from './instance.js';
 import MariaTestModel from './models/test.mysql.js';
@@ -18,9 +19,7 @@ function processEndCheck(x) {
 
 function stupidFindIdValue(x) {
   const idValue = JSON.stringify(x).split(',')[0].split('');
-  for (let i = 0; i < 7; i++) {
-    idValue.shift();
-  }
+  idValue.splice(0, 7);
   return idValue.join('');
 }
 
