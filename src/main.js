@@ -1,7 +1,6 @@
 import './common/dotenv.js';
 import * as readline from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
-import { join } from 'node:path';
 
 import instance from './instance.js';
 import MariaTestModel from './models/test.mysql.js';
@@ -134,16 +133,19 @@ const database = async () => {
         const getUpdateText = await rl.question('\nplease enter update text ');
 
         let updateFilter;
+        let findResultFilter;
 
         if (getChooseFilter === 'text') {
-          const filterByText = { testcol: getUpdateFilter };
-          const jsonData = await mysqlTestModel.findByFilterAsync(conncet, filterByText); // database에서 불러와서 id를 추출하는 과정
-          updateFilter = { id: stupidFindIdValue(jsonData) };
+          updateFilter = { testcol: getUpdateFilter };
+          findResultFilter = { testcol: getUpdateText };
+          // const jsonData = await mysqlTestModel.findByFilterAsync(conncet, filterByText); // database에서 불러와서 id를 추출하는 과정
+          // updateFilter = { id: stupidFindIdValue(jsonData) };
         } else if (!Number.isInteger(Number(getUpdateFilter))) {
           instance.logger.error('error: id must be Number');
           break;
         } else {
           updateFilter = { id: getUpdateFilter };
+          findResultFilter = { id: getUpdateFilter };
         }
 
         const updateTextData = { testcol: getUpdateText };
@@ -151,10 +153,10 @@ const database = async () => {
         const UpdateBoolean = await mysqlTestModel.updateByFilterAsync(conncet, updateFilter, updateTextData);
 
         if (UpdateBoolean === true) {
-          const updataResult = await mysqlTestModel.findByFilterAsync(conncet, updateFilter); // 요걸 생략할 순 없을까?
+          const updataResult = await mysqlTestModel.findByFilterAsync(conncet, findResultFilter); // 요걸 생략할 순 없을까?
           instance.logger.info(JSON.stringify(updataResult));
         } else {
-          instance.logger.error(`error: that id not exist in ${mysqlTestModel.tableName}`);
+          instance.logger.error(`error: that id or textcol not exist in ${mysqlTestModel.tableName}`);
         }
 
         break;
