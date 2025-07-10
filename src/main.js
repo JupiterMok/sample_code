@@ -16,6 +16,14 @@ function processEndCheck(x) {
   }
 }
 
+function stupidFindIdValue(x) {
+  const idValue = JSON.stringify(x).split(',')[0].split('');
+  for (let i = 0; i < 7; i++) {
+    idValue.shift();
+  }
+  return idValue.join('');
+}
+
 // const app = async () => {
 //   const mysqlTestModel = new MariaTestModel();
 //   const conn = await MariaTestModel.openConnectionAsync();
@@ -40,6 +48,7 @@ const database = async () => {
 
   const list = await mysqlTestModel.findByFilterAsync(conncet); // 전체 리스트 가져오기
   instance.logger.info(JSON.stringify(list, null, 2));
+  // instance.logger.info(JSON.stringify(list).toString().split(',').join('\n')); 이제 여기서 2개씩 합쳐서 보여주면 됨.
 
   while (true) {
     const answer = await rl.question('\nplease enter IDUS, if you want exit enter blank '); // 분기 1 readline으로 문자열 받아와서 공백이면 종료하고 IDUS면 각각 맞는 명령어 실행
@@ -115,24 +124,38 @@ const database = async () => {
       }
 
       case 'update': {
-        const getUpdataId = await rl.question('\nplease enter update Id filter ');
-        const getUpdateText = await rl.question('\nplease enter update text ');
+        const getChooseFilter = await rl.question('\nwhich do you want filter Id or text? ');
 
-        if (!Number.isInteger(Number(getUpdataId))) {
-          instance.logger.error('error: id must be Number');
+        if (getChooseFilter !== 'Id' && getChooseFilter !== 'text') {
+          instance.logger.error(`error: wrong choose`);
           break;
         }
 
-        const updateIdFilter = { id: getUpdataId };
+        const getUpdateFilter = await rl.question('\nplease enter update filter ');
+        const getUpdateText = await rl.question('\nplease enter update text ');
+
+        let updateFilter;
+
+        if (getChooseFilter === 'text') {
+          const filterByText = { testcol: getUpdateFilter };
+          const jsonData = await mysqlTestModel.findByFilterAsync(conncet, filterByText); // database에서 불러와서 id를 추출하는 과정
+          updateFilter = { id: stupidFindIdValue(jsonData) };
+        } else if (!Number.isInteger(Number(getUpdateFilter))) {
+          instance.logger.error('error: id must be Number');
+          break;
+        } else {
+          updateFilter = { id: getUpdateFilter };
+        }
+
         const updateTextData = { testcol: getUpdateText };
 
-        const UpdateBoolean = await mysqlTestModel.updateByFilterAsync(conncet, updateIdFilter, updateTextData);
+        const UpdateBoolean = await mysqlTestModel.updateByFilterAsync(conncet, updateFilter, updateTextData);
 
-        if (UpdateBoolean === 'true') {
-          const updataResult = await mysqlTestModel.findByFilterAsync(conncet, updateIdFilter); // 요걸 생략할 순 없을까?
+        if (UpdateBoolean === true) {
+          const updataResult = await mysqlTestModel.findByFilterAsync(conncet, updateFilter); // 요걸 생략할 순 없을까?
           instance.logger.info(JSON.stringify(updataResult));
         } else {
-          instance.logger.error(`error: false query enter`);
+          instance.logger.error(`error: that id not exist in ${mysqlTestModel.tableName}`);
         }
 
         break;
