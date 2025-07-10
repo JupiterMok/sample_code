@@ -40,7 +40,6 @@ const database = async () => {
 
   const list = await mysqlTestModel.findByFilterAsync(conncet); // 전체 리스트 가져오기
   instance.logger.info(JSON.stringify(list, null, 2));
-  // instance.logger.info(list.join('\n')); 요거 되게 만들어보기
 
   while (true) {
     const answer = await rl.question('\nplease enter IDUS, if you want exit enter blank '); // 분기 1 readline으로 문자열 받아와서 공백이면 종료하고 IDUS면 각각 맞는 명령어 실행
@@ -48,37 +47,42 @@ const database = async () => {
 
     switch (answer) {
       case 'insert': {
-        const getCliInputValue = await rl.question('\nplease enter text ');
-
+        const getCliInputValue = await rl.question('\nplease enter insert text ');
         const inputData = { testcol: getCliInputValue };
 
         const getInsertId = await mysqlTestModel.insertAsync(conncet, inputData);
-
         const insertDataId = { id: getInsertId };
 
         const insertResult = await mysqlTestModel.findByFilterAsync(conncet, insertDataId); // 이거 한 줄로 줄일 수 없는지 확인하기. 윗 줄의 함수받아와서 insert한 목록 보여줌.
         instance.logger.info(JSON.stringify(insertResult));
         break;
       }
+
       case 'select': {
-        const selectId = await rl.question(`\nplease enter id what you want select `);
+        const getIdfilter = await rl.question(`\nplease enter id what you want select `);
         let selectResult;
 
-        if (selectId === '') {
+        if (getIdfilter === '') {
           selectResult = await mysqlTestModel.allAsync(conncet);
-        } else if (!Number.isInteger(Number(selectId))) {
-          instance.logger.error('error: id must be Number');
-        } else {
-          const inputData = { id: selectId };
-
-          selectResult = await mysqlTestModel.findByFilterAsync(conncet, inputData);
-
-          instance.logger.info(JSON.stringify(selectResult, null, 2));
         }
+
+        if (getIdfilter !== '' && !Number.isInteger(Number(getIdfilter))) {
+          instance.logger.error('error: id must be Number');
+          break;
+        }
+
+        if (getIdfilter !== '' && Number.isInteger(Number(getIdfilter))) {
+          const selectIdFilter = { id: getIdfilter };
+          selectResult = await mysqlTestModel.findByFilterAsync(conncet, selectIdFilter);
+        }
+
+        instance.logger.info(JSON.stringify(selectResult, null, 2));
         break;
       }
+
       case 'selectnew': {
         const selectId = await rl.question(`\nplease enter id what you want select `);
+
         if (!Number.isInteger(Number(selectId))) {
           instance.logger.error('error: id must be Number');
           break;
@@ -111,27 +115,28 @@ const database = async () => {
       }
 
       case 'update': {
-        const getUpdateId_Text = await rl.question('\nplease enter update filter and text ');
-        // const updateText = await rl.question('\nplease enter update text ');
+        const getUpdateIdText = await rl.question('\nplease enter update Id filter and text ');
 
-        const upDateData = getUpdateId_Text.split(' ');
+        const upDateIdAndText = getUpdateIdText.split(' '); // 오류 날 확률 높음
 
-        if (!Number.isInteger(Number(upDateData[0]))) {
+        if (!Number.isInteger(Number(upDateIdAndText[0]))) {
           instance.logger.error('error: id must be Number');
           break;
         }
 
-        const findDataId = { id: upDateData[0] };
-        const toUpdateData = { testcol: upDateData[1] };
+        const updateIdFilter = { id: upDateIdAndText[0] };
+        const updateTextData = { testcol: upDateIdAndText[1] };
 
-        const upDateBoolean = await mysqlTestModel.updateByFilterAsync(conncet, findDataId, toUpdateData);
+        const checkUpdateId = await mysqlTestModel.countByFilterAsync(conncet, updateIdFilter);
 
-        if (upDateBoolean === false) {
+        if (checkUpdateId === 0) {
           instance.logger.error(`error: that id not exist in ${mysqlTestModel.tableName}`);
           break;
         }
 
-        const updataResult = await mysqlTestModel.findByFilterAsync(conncet, findDataId); // 요걸 생략할 순 없을까?
+        await mysqlTestModel.updateByFilterAsync(conncet, updateIdFilter, updateTextData);
+        const updataResult = await mysqlTestModel.findByFilterAsync(conncet, updateIdFilter); // 요걸 생략할 순 없을까?
+
         instance.logger.info(JSON.stringify(updataResult));
 
         break;
@@ -146,16 +151,38 @@ const database = async () => {
 
         const findDeleteId = { id: deleteId };
 
-        const deleteBoolean = await mysqlTestModel.deleteByFilterAsync(conncet, findDeleteId);
+        const checkdeleteId = await mysqlTestModel.countByFilterAsync(conncet, findDeleteId);
 
-        if (deleteBoolean === false) {
+        if (checkdeleteId === 0) {
           instance.logger.error(`error: that id not exist in ${mysqlTestModel.tableName}`);
           break;
         }
 
         const deleteResult = await mysqlTestModel.findByFilterAsync(conncet, findDeleteId);
-        instance.logger.info(JSON.stringify(deleteResult));
 
+        await mysqlTestModel.deleteByFilterAsync(conncet, findDeleteId);
+
+        instance.logger.info(`${deleteResult} in ${mysqlTestModel.tableName} is deleted`);
+
+        break;
+      }
+
+      case 'deletenew': {
+        const deleteId = await rl.question('\nplease enter delete id ');
+
+        if (!Number.isInteger(Number(deleteId))) {
+          instance.logger.error('error: id must be Number');
+        }
+
+        const findDeleteId = { id: deleteId };
+
+        const deleteBoolean = await mysqlTestModel.deleteByFilterAsync(conncet, findDeleteId);
+
+        if (deleteBoolean === 'true') {
+          instance.logger.info(`${findDeleteId} in ${mysqlTestModel.tableName} is deleted`);
+        } else {
+          instance.logger.error(`error: that id not exist in ${mysqlTestModel.tableName}`);
+        }
         break;
       }
 
