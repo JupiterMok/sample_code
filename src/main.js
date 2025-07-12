@@ -130,7 +130,11 @@ const database = async () => {
         let updateFilter;
         let findResultFilter;
 
-        if (Number.isInteger(Number(getUpdateFilter))) {
+        if (getUpdateFilter === 'all') {
+          // 이거 필터가 없으면 전체 검색이 안 됨
+          updateFilter = {};
+          findResultFilter = updateFilter;
+        } else if (Number.isInteger(Number(getUpdateFilter))) {
           updateFilter = { id: getUpdateFilter };
           findResultFilter = updateFilter;
         } else if (typeof getUpdateFilter === 'string') {
