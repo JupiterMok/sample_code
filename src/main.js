@@ -122,12 +122,7 @@ const database = async () => {
       }
 
       case 'update': {
-        const getChooseFilter = await rl.question('\nwhich do you want filter Id or text? ');
-
-        if (getChooseFilter !== 'Id' && getChooseFilter !== 'text') {
-          instance.logger.error(`error: wrong choose`);
-          break;
-        }
+        // const getChooseFilter = await rl.question('\nwhich do you want filter Id or text? ');
 
         const getUpdateFilter = await rl.question('\nplease enter update filter ');
         const getUpdateText = await rl.question('\nplease enter update text ');
@@ -135,17 +130,16 @@ const database = async () => {
         let updateFilter;
         let findResultFilter;
 
-        if (getChooseFilter === 'text') {
+        if (Number.isInteger(Number(getUpdateFilter))) {
+          updateFilter = { id: getUpdateFilter };
+          findResultFilter = updateFilter;
+        } else if (typeof getUpdateFilter === 'string') {
+          // update filter를 sting으로 받았을 때, datebase에 같은 값이 여러 개이면 어떻게 되는지 확인.
           updateFilter = { testcol: getUpdateFilter };
           findResultFilter = { testcol: getUpdateText };
-          // const jsonData = await mysqlTestModel.findByFilterAsync(conncet, filterByText); // database에서 불러와서 id를 추출하는 과정
-          // updateFilter = { id: stupidFindIdValue(jsonData) };
-        } else if (!Number.isInteger(Number(getUpdateFilter))) {
-          instance.logger.error('error: id must be Number');
-          break;
         } else {
-          updateFilter = { id: getUpdateFilter };
-          findResultFilter = { id: getUpdateFilter };
+          instance.logger.error('error: wrong update filter form');
+          break;
         }
 
         const updateTextData = { testcol: getUpdateText };
