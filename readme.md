@@ -5,8 +5,9 @@
 ### 20250710
 
 - [x] update 기능에서 대상을 서치할 때, id뿐 아니라 testcol으로도 검색 가능하게 분리하기
-- [ ] database 함수를 main 밖으로 빼내서 main 구조를 최대한 간단하게 바꿀 것
+- [x] database 함수를 main 밖으로 빼내서 main 구조를 최대한 간단하게 바꿀 것
 - [ ] express, route 를 사용하는 샘플 만들기, CRUD를 사용하게 만들기, 추가로 main이 길어지면 밖으로 빼내기
+- [ ] Enum으로 if문 간단하게 만들기
 
 ### 20250703
 
