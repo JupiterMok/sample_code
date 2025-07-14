@@ -8,7 +8,7 @@ import mysqlserver from '../core/mysql.core.js';
  * @param {*} b는 CRUD 아래의 filter 받음
  * @param {*} c는
  */
-const serverDatabase = async (a, b = '', c) => {
+const serverDatabase = async (a, b = 7, c) => {
   const mysqlTestModel = new MariaTestModel();
   const conncet = await MariaTestModel.openConnectionAsync(); // conncet에 데이터베이스 연결을 저장
 
@@ -29,7 +29,7 @@ const serverDatabase = async (a, b = '', c) => {
 
       const selectResult = await mysqlTestModel.findByFilterAsync(conncet, inputData);
 
-      return JSON.stringify(selectResult, null, 2);
+      return selectResult;
     }
     default:
       return `error: request is not a insert, update, select, delete, count`;
