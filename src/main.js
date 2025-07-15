@@ -10,6 +10,9 @@ import mysqlserver from './core/mysql.core.js';
 import database from './models/datebase.js';
 import serverDatabase from './models/serverdatadase.js';
 
+const mysqlTestModel = new MariaTestModel();
+const conncet = await MariaTestModel.openConnectionAsync();
+
 const app = express();
 // const router = express.Router();
 const port = 3000;
@@ -17,7 +20,7 @@ const port = 3000;
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.send('This is mysql test pge');
 });
 
 app.use((req, res, next) => {
@@ -25,15 +28,25 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/user/:id', (req, res) => {
-  instance.logger.info(req.params.id); // 매개변수라서 .params로 접근을 한다.
-  res.send(req.params.id);
-});
-
-app.get('/:id', (req, res) => {
-  serverDatabase(req.params.id).then((result) => {
+app.get('/:id/:filter', (req, res) => {
+  // /:id/:id 이렇게 못하나?
+  serverDatabase(req.params.id, req.params.filter).then((result) => {
     res.json(result);
     instance.logger.info(result);
+  });
+});
+
+app.get('/tool/select/:id', (req, res) => {
+  // serverDatabase에서 기능을 밖으로 빼낸 버전
+  mysqlTestModel.findByFilterAsync(conncet, { id: req.params.id }).then((result) => {
+    res.json(result);
+  });
+});
+
+app.get('/tool/update/:id/:text', (req, res) => {
+  // serverDatabase에서 기능을 밖으로 빼낸 버전
+  mysqlTestModel.updateByFilterAsync(conncet, { id: req.params.id }, { testcol: req.params.text }).then((result) => {
+    res.json(`update is ${result}`);
   });
 });
 
