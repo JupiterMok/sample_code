@@ -45,11 +45,16 @@ const database = async () => {
   instance.logger.info(JSON.stringify(list, null, 2));
   // instance.logger.info(JSON.stringify(list).toString().split(',').join('\n')); 이제 여기서 2개씩 합쳐서 보여주면 됨.
 
-  while (true) {
+  let isLive = true;
+  while (isLive) {
     const answer = await rl.question('\nplease enter IDUS, if you want exit enter blank '); // 분기 1 readline으로 문자열 받아와서 공백이면 종료하고 IDUS면 각각 맞는 명령어 실행
     _processEndCheck(answer);
 
     switch (answer) {
+      case 'break': {
+        isLive = false;
+        break;
+      }
       case 'insert': {
         const getCliInputValue = await rl.question('\nplease enter insert text ');
         const inputData = { testcol: getCliInputValue };
@@ -205,6 +210,7 @@ const database = async () => {
         instance.logger.error(`text error: answer is not a insert, update, select, delete, count`);
     } // swich 문 중괄호
   } // while 문 중괄호
+  await mysqlTestModel.closeConnectionAsync(conncet); // 데이터베이스 연결 종료
 }; // funtion 선언 중괄호
 
 export default database;

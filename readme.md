@@ -2,6 +2,14 @@
 
 ## todo
 
+### 20250718
+
+- [x] 각 명령어마다 conncet 열고 닫게 바꾸기
+- [x] then 사용하는 것을 async로 바꾸기
+- [ ] insert랑 update를 app.post를 이용하게 바꾸기 (body를 이용해서)
+- [ ] routing 하기, route.js로 분리하기
+- [ ] Eunm으로 if 문 간단하게 바꾸기
+
 ### 20250710
 
 - [x] update 기능에서 대상을 서치할 때, id뿐 아니라 testcol으로도 검색 가능하게 분리하기
@@ -21,6 +29,7 @@
 - 이름 지을 때 앞부분 맞추기
 - 항상 커밋하는 습관 들이기
 - 주소창이 마치 콘솔창처럼 쓰이는 것 같은 느낌이 든다.
+- express 모듈에서 get과 post를 주로 쓴다. app.post를 이용해서 update랑 insert를 처리한다. get에서는 보안상의 이유로 body를 쓰지 않고 body는 post로 처리한다.
 
 ## update list
 
@@ -28,3 +37,11 @@
 - 추가 수정사항 생각해오기
 - 사이트에 표로 정보 뿌리게 만들기
 - 터미널이 아니라 사이트에서 버튼으로 IUSD 작동하게 만들기
+
+명령어
+
+```
+curl
+```
+
+http://localhost:3000
