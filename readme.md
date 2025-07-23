@@ -2,13 +2,19 @@
 
 ## todo
 
+### 20250723
+
+- [ ] discord 방송 셋팅하기
+- [ ] insert post로 바꾸기
+- [ ] routing 해서 각기 다른 테이블로 연결해놓기
+
 ### 20250718
 
 - [x] github 연동 다시 해놓기
 - [x] 각 명령어마다 conncet 열고 닫게 바꾸기
 - [x] then 사용하는 것을 async로 바꾸기
 - [x] insert랑 update를 app.post를 이용하게 바꾸기 (body를 이용해서)
-- [ ] routing 하기, route.js로 분리하기
+- [x] routing 하기, route.js로 분리하기
 - [ ] Eunm으로 if 문 간단하게 바꾸기
 
 ### 20250710
@@ -41,8 +47,16 @@
 
 명령어
 
-```
-curl
-```
+```shell
+curl -X POST \
+     -H "Content-Type: application/json" \
+     http://localhost:3000/tool/select?id=18
+curl -X GET \
+     -H "Content-Type: application/json" \
+     -d '{"id":18}' \
+     http://localhost:3000/tool/delete
 
-http://localhost:3000
+curl http://localhost:3000/tool/select?id=21
+
+curl http://localhost:3000/tool
+```

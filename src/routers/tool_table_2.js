@@ -1,7 +1,7 @@
 import express, { Router } from 'express';
 
 import instance from '../instance.js';
-import MariaTestModel from '../models/test.mysql.js';
+import MariaTestModel from '../models/test.mysql_2.js';
 import mysqlserver from '../core/mysql.core.js';
 
 const router = express.Router();
@@ -11,21 +11,24 @@ router
     const message = { message: 'This is mysql test page' };
     res.json(message);
   })
-  .get('/select/:id', async (req, res) => {
+  .get('/select', async (req, res) => {
+    const { id } = req.query;
     const connect = await MariaTestModel.openConnectionAsync();
     const mysqlTestModel = new MariaTestModel();
-    const result = await mysqlTestModel.findByFilterAsync(connect, req.id);
+    const result = await mysqlTestModel.findByFilterAsync(connect, { id });
 
-    // await mysqlTestModel.closeConnectionAsync(connect); 함수가 정의되지 않음
+    // await mysqlTestModel.closeConnectionAsync(connect);
 
     res.json(result);
-  })
-  .get('/insert/:text', async (req, res) => {
+  });
+
+router
+  .post('/insert', async (req, res) => {
     const connect = await MariaTestModel.openConnectionAsync();
     const mysqlTestModel = new MariaTestModel();
 
-    const insertdata = { testcol: req.text };
-    const index = await mysqlTestModel.insertAsync(connect, insertdata);
+    const testcol = { testcol: req.body.testcol };
+    const index = await mysqlTestModel.insertAsync(connect, testcol);
 
     const resreachFilter = { id: index };
     const result = await mysqlTestModel.findByFilterAsync(connect, resreachFilter);
@@ -33,9 +36,7 @@ router
     // await mysqlTestModel.closeConnectionAsync(connect); 함수가 정의되지 않음
 
     res.json(result);
-  });
-
-router
+  })
   .post('/update', async (req, res) => {
     const connect = await MariaTestModel.openConnectionAsync();
     const mysqlTestModel = new MariaTestModel();
