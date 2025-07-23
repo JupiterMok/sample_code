@@ -4,9 +4,10 @@
 
 ### 20250718
 
+- [x] github 연동 다시 해놓기
 - [x] 각 명령어마다 conncet 열고 닫게 바꾸기
 - [x] then 사용하는 것을 async로 바꾸기
-- [ ] insert랑 update를 app.post를 이용하게 바꾸기 (body를 이용해서)
+- [x] insert랑 update를 app.post를 이용하게 바꾸기 (body를 이용해서)
 - [ ] routing 하기, route.js로 분리하기
 - [ ] Eunm으로 if 문 간단하게 바꾸기
 

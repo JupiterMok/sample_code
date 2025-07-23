@@ -1,15 +1,10 @@
-import './common/dotenv.js';
-import * as readline from 'node:readline/promises';
-import { stdin as input, stdout as output } from 'node:process';
+import express, { Router } from 'express';
 
-import express from 'express';
+import instance from '../instance.js';
+import MariaTestModel from '../models/test.mysql.js';
+import mysqlserver from '../core/mysql.core.js';
 
-import instance from './instance.js';
-import MariaTestModel from './models/test.mysql.js';
-import mysqlserver from './core/mysql.core.js';
-import database from './models/datebase.js';
-import serverDatabase from './models/serverdatadase.js';
-
+// 이걸 함수로 내보내야 하나?
 const app = express();
 // const router = express.Router();
 const port = 3000;
@@ -74,5 +69,4 @@ app.post('/tool/delete', async (req, res) => {
 app.listen(port, () => {
   instance.logger.info(`Example app listening on port ${port}`);
 });
-
-// database();
+export default Router;
