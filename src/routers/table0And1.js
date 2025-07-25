@@ -1,10 +1,27 @@
 import express, { Router } from 'express';
 
 import instance from '../instance.js';
-import MariaTestModel0 from '../models/test.mysql_0.js';
 import mysqlserver from '../core/mysql.core.js';
+import MariaTestModel0 from '../models/table_0.js';
+import MariaTestModel1 from '../models/table_1.js';
 
 const router = express.Router();
+
+let connect;
+
+async function tableCheck(tableNumber) {
+  if (Number(tableNumber) === 0) {
+    connect = await MariaTestModel0.openConnectionAsync();
+    const mysqlTestModel = new MariaTestModel0();
+    return mysqlTestModel;
+  } else if (Number(tableNumber) === 1) {
+    connect = await MariaTestModel1.openConnectionAsync();
+    const mysqlTestModel = new MariaTestModel1();
+    return mysqlTestModel;
+  } else {
+    instance.logger.error(`error: wonrg table number`);
+  }
+}
 
 router
   .get('/', (req, res) => {
@@ -14,8 +31,7 @@ router
   .get('/select', async (req, res) => {
     const { id } = req.query;
 
-    const connect = await MariaTestModel0.openConnectionAsync();
-    const mysqlTestModel = new MariaTestModel0();
+    const mysqlTestModel = await tableCheck(req.query.table);
 
     const result = await mysqlTestModel.findByFilterAsync(connect, { id });
 
@@ -26,8 +42,7 @@ router
 
 router
   .post('/insert', async (req, res) => {
-    const connect = await MariaTestModel0.openConnectionAsync();
-    const mysqlTestModel = new MariaTestModel0();
+    const mysqlTestModel = await tableCheck(req.query.table);
 
     const testcol = { testcol: req.body.testcol };
     const index = await mysqlTestModel.insertAsync(connect, testcol);
@@ -40,8 +55,7 @@ router
     res.json(result);
   })
   .post('/update', async (req, res) => {
-    const connect = await MariaTestModel0.openConnectionAsync();
-    const mysqlTestModel = new MariaTestModel0();
+    const mysqlTestModel = await tableCheck(req.query.table);
 
     const filter = { id: req.body.id };
     const updateData = { testcol: req.body.testcol };
@@ -58,8 +72,7 @@ router
     res.json(message);
   })
   .post('/delete', async (req, res) => {
-    const connect = await MariaTestModel0.openConnectionAsync();
-    const mysqlTestModel = new MariaTestModel0();
+    const mysqlTestModel = await tableCheck(req.query.table);
 
     const result = await mysqlTestModel.deleteByFilterAsync(connect, req.body); // 이것도 object로 선언해주는 게 좋나?
 

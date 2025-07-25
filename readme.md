@@ -5,7 +5,7 @@
 ### 20250723
 
 - [ ] discord 방송 셋팅하기
-- [ ] insert post로 바꾸기
+- [x] insert post로 바꾸기
 - [ ] routing 해서 각기 다른 테이블로 연결해놓기
 
 ### 20250718
