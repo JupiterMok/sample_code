@@ -4,7 +4,7 @@ import instance from '../instance.js';
 // 모델
 class MariaTestModel extends mysqlserver {
   constructor() {
-    super('table0', 'id', 'sort');
+    super('testtable4', 'id', 'sort');
   }
 }
 

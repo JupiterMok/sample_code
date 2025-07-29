@@ -2,21 +2,21 @@ import express, { Router } from 'express';
 
 import instance from '../instance.js';
 import mysqlserver from '../core/mysql.core.js';
-import MariaTestModel0 from '../models/table_0.js';
-import MariaTestModel1 from '../models/table_1.js';
+import MariaTestModel3 from '../models/table_3.js';
+import MariaTestModel4 from '../models/table_4.js';
 
 const router = express.Router();
 
 let connect;
 
 async function tableCheck(tableNumber) {
-  if (Number(tableNumber) === 0) {
-    connect = await MariaTestModel0.openConnectionAsync();
-    const mysqlTestModel = new MariaTestModel0();
+  if (Number(tableNumber) === 3) {
+    connect = await MariaTestModel3.openConnectionAsync();
+    const mysqlTestModel = new MariaTestModel3();
     return mysqlTestModel;
-  } else if (Number(tableNumber) === 1) {
-    connect = await MariaTestModel1.openConnectionAsync();
-    const mysqlTestModel = new MariaTestModel1();
+  } else if (Number(tableNumber) === 4) {
+    connect = await MariaTestModel4.openConnectionAsync();
+    const mysqlTestModel = new MariaTestModel4();
     return mysqlTestModel;
   } else {
     instance.logger.error(`error: wonrg table number`);
@@ -29,7 +29,7 @@ router
     res.json(message);
   })
   .get('/select', async (req, res) => {
-    const { id } = req.query;
+    const id = { id: req.query.id };
 
     const mysqlTestModel = await tableCheck(req.query.table);
 
