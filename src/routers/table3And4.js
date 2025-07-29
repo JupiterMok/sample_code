@@ -7,15 +7,11 @@ import MariaTestModel4 from '../models/table_4.js';
 
 const router = express.Router();
 
-let connect;
-
-async function tableCheck(tableNumber) {
+function tableCheck(tableNumber) {
   if (Number(tableNumber) === 3) {
-    connect = await MariaTestModel3.openConnectionAsync();
     const mysqlTestModel = new MariaTestModel3();
     return mysqlTestModel;
   } else if (Number(tableNumber) === 4) {
-    connect = await MariaTestModel4.openConnectionAsync();
     const mysqlTestModel = new MariaTestModel4();
     return mysqlTestModel;
   } else {
@@ -23,46 +19,70 @@ async function tableCheck(tableNumber) {
   }
 }
 
-router
-  .get('/', (req, res) => {
-    const message = { message: 'This is mysql test page' };
-    res.json(message);
-  })
-  .get('/select', async (req, res) => {
-    const id = { id: req.query.id };
+async function connecting(tableNumber) {
+  if (Number(tableNumber) === 3) {
+    const connect = await MariaTestModel3.openConnectionAsync();
+    return connect;
+  } else if (Number(tableNumber) === 4) {
+    const connect = await MariaTestModel4.openConnectionAsync();
+    return connect;
+  } else {
+    instance.logger.error(`error: wonrg table number`);
+  }
+}
 
-    const mysqlTestModel = await tableCheck(req.query.table);
+async function closeConnect(tableNumber, connect) {
+  if (Number(tableNumber) === 3) {
+    await MariaTestModel3.closeConnectionAsync(connect);
+  } else if (Number(tableNumber) === 4) {
+    await MariaTestModel4.closeConnectionAsync(connect);
+  } else {
+    instance.logger.error(`error: the Table will be disconnect was incorrectly selected`);
+  }
+}
 
-    const result = await mysqlTestModel.findByFilterAsync(connect, { id });
+router.get('/select', async (req, res) => {
+  const { table, id } = req.query;
 
-    // await mysqlTestModel.closeConnectionAsync(connect);
+  const mysqlTestModel = await tableCheck(table);
+  const connect = await connecting(table);
 
-    res.json(result);
-  });
+  const result = await mysqlTestModel.findByFilterAsync(connect, { id });
+
+  await closeConnect(table, connect);
+
+  res.json(result);
+});
 
 router
   .post('/insert', async (req, res) => {
-    const mysqlTestModel = await tableCheck(req.query.table);
+    const { table } = req.query;
+    const mysqlTestModel = await tableCheck(table);
 
-    const testcol = { testcol: req.body.testcol };
-    const index = await mysqlTestModel.insertAsync(connect, testcol);
+    const connect = await connecting(table);
 
-    const resreachFilter = { id: index };
-    const result = await mysqlTestModel.findByFilterAsync(connect, resreachFilter);
+    const { testcol } = req.body;
+    const id = await mysqlTestModel.insertAsync(connect, { testcol });
 
-    // await mysqlTestModel.closeConnectionAsync(connect); 함수가 정의되지 않음
+    // const resreachFilter = { id: index };
+    const result = await mysqlTestModel.findByFilterAsync(connect, { id });
+
+    await closeConnect(table, connect);
 
     res.json(result);
   })
   .post('/update', async (req, res) => {
-    const mysqlTestModel = await tableCheck(req.query.table);
+    const { table, id } = req.query;
 
-    const filter = { id: req.body.id };
-    const updateData = { testcol: req.body.testcol };
+    const mysqlTestModel = await tableCheck(table);
 
-    const result = await mysqlTestModel.updateByFilterAsync(connect, filter, updateData);
+    const connect = await connecting(table);
 
-    // await mysqlTestModel.closeConnectionAsync(connect); 함수가 정의되지 않음
+    const { testcol } = req.body;
+
+    const result = await mysqlTestModel.updateByFilterAsync(connect, { id }, { testcol });
+
+    await closeConnect(table, connect);
 
     let message = { message: 'update is fail' };
     if (result === true) {
@@ -72,11 +92,23 @@ router
     res.json(message);
   })
   .post('/delete', async (req, res) => {
-    const mysqlTestModel = await tableCheck(req.query.table);
+    const { table, id } = req.query;
 
-    const result = await mysqlTestModel.deleteByFilterAsync(connect, req.body); // 이것도 object로 선언해주는 게 좋나?
+    const mysqlTestModel = await tableCheck(table);
 
-    // await mysqlTestModel.closeConnectionAsync(connect); 함수가 정의되지 않음
+    const connect = await connecting(table);
+
+    let result;
+
+    const { testcol } = req.body;
+
+    if (testcol === undefined) {
+      result = await mysqlTestModel.deleteByFilterAsync(connect, { id });
+    } else {
+      result = await mysqlTestModel.deleteByFilterAsync(connect, { testcol });
+    }
+
+    await closeConnect(table, connect);
 
     let message = { message: 'delete is fail' };
     if (result === true) {
