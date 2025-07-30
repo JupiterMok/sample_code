@@ -19,7 +19,7 @@ function tableCheck(tableNumber) {
   }
 }
 
-async function connecting(tableNumber) {
+async function openConnect(tableNumber) {
   if (Number(tableNumber) === 3) {
     const connect = await MariaTestModel3.openConnectionAsync();
     return connect;
@@ -45,7 +45,7 @@ router.get('/select', async (req, res) => {
   const { table, id } = req.query;
 
   const mysqlTestModel = await tableCheck(table);
-  const connect = await connecting(table);
+  const connect = await openConnect(table);
 
   const result = await mysqlTestModel.findByFilterAsync(connect, { id });
 
@@ -59,7 +59,7 @@ router
     const { table } = req.query;
     const mysqlTestModel = await tableCheck(table);
 
-    const connect = await connecting(table);
+    const connect = await openConnect(table);
 
     const { testcol } = req.body;
     const id = await mysqlTestModel.insertAsync(connect, { testcol });
@@ -76,7 +76,7 @@ router
 
     const mysqlTestModel = await tableCheck(table);
 
-    const connect = await connecting(table);
+    const connect = await openConnect(table);
 
     const { testcol } = req.body;
 
@@ -92,21 +92,15 @@ router
     res.json(message);
   })
   .post('/delete', async (req, res) => {
-    const { table, id } = req.query;
+    const { table } = req.query;
 
     const mysqlTestModel = await tableCheck(table);
 
-    const connect = await connecting(table);
+    const connect = await openConnect(table);
 
-    let result;
+    const filter = req.body;
 
-    const { testcol } = req.body;
-
-    if (testcol === undefined) {
-      result = await mysqlTestModel.deleteByFilterAsync(connect, { id });
-    } else {
-      result = await mysqlTestModel.deleteByFilterAsync(connect, { testcol });
-    }
+    const result = await mysqlTestModel.deleteByFilterAsync(connect, filter);
 
     await closeConnect(table, connect);
 
