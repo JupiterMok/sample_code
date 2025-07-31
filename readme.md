@@ -2,6 +2,14 @@
 
 ## todo
 
+### 20250730
+
+- [ ] 더미 코드 지우기, 테이블 0~2.
+- [ ] user table 만들기, id login_id name password email phone 포함하기.
+- [ ] goods table 만들기, id name price description category 포함하기.
+- [ ] order table 만들기, id user_id goods_id quantity order_date 포함하기.
+- [ ] run.sh 구성하기.
+
 ### 20250723
 
 - [x] discord 방송 셋팅하기
@@ -37,6 +45,7 @@
 - 항상 커밋하는 습관 들이기
 - 주소창이 마치 콘솔창처럼 쓰이는 것 같은 느낌이 든다.
 - express 모듈에서 get과 post를 주로 쓴다. app.post를 이용해서 update랑 insert를 처리한다. get에서는 보안상의 이유로 body를 쓰지 않고 body는 post로 처리한다.
+- 함수는 일을 줄이기 위해서 사용, 일을 늘리면 안 됨
 
 ## update list
 
