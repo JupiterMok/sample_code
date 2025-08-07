@@ -22,26 +22,24 @@ router.get('/select', async (req, res) => {
 router
   .post('/insert', async (req, res) => {
     const mysqlTestModel = new MariaTestModel0();
-
     const connect = await MariaTestModel0.openConnectionAsync();
 
     const { testcol } = req.body;
     const id = await mysqlTestModel.insertAsync(connect, { testcol });
 
-    // const resreachFilter = { id: index };
-    const result = await mysqlTestModel.findByFilterAsync(connect, { id });
+    const index = { id };
+
+    const result = await mysqlTestModel.findByFilterAsync(connect, index);
 
     await MariaTestModel0.closeConnectionAsync(connect);
 
     res.json(result);
   })
   .post('/update', async (req, res) => {
-    const { id } = req.query;
-
     const mysqlTestModel = new MariaTestModel0();
-
     const connect = await MariaTestModel0.openConnectionAsync();
 
+    const { id } = req.query;
     const { testcol } = req.body;
 
     const result = await mysqlTestModel.updateByFilterAsync(connect, { id }, { testcol });
@@ -57,12 +55,11 @@ router
   })
   .post('/delete', async (req, res) => {
     const mysqlTestModel = new MariaTestModel0();
-
     const connect = await MariaTestModel0.openConnectionAsync();
 
-    const filter = req.body;
+    const { filter } = req.body;
 
-    const result = await mysqlTestModel.deleteByFilterAsync(connect, filter);
+    const result = await mysqlTestModel.deleteByFilterAsync(connect, { filter });
 
     await MariaTestModel0.closeConnectionAsync(connect);
 

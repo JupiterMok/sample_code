@@ -4,11 +4,16 @@
 
 ### 20250730
 
-- [ ] 더미 코드 지우기, 테이블 0~2.
+- [x] 더미 코드 지우기, 테이블 0~2.
 - [ ] user table 만들기, id login_id name password email phone 포함하기.
 - [ ] goods table 만들기, id name price description category 포함하기.
 - [ ] order table 만들기, id user_id goods_id quantity order_date 포함하기.
 - [ ] run.sh 구성하기.
+
+#### 20250730 질문
+
+- object 선언을 다 구조 파괴문으로 바꿨는데 잘한 일인가?
+- req.body, req.params, req.query 를 함수에 파라미터로 받으면 보안 문제가 있다고 하셨는데 중간에 가로챌 수 있는 것인가?
 
 ### 20250723
 
