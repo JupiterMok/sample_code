@@ -1,20 +1,8 @@
 #!/usr/bin/env bash
 
-curl http://localhost:3000/table3/tool/select?id=5
-
-curl http://localhost:3000/table3/tool/select
-
 curl -X POST \
     -H "Content-Type: application/json" \
-    -d '{"testcol":"jjj"}' \
-    http://localhost:3000/table3/tool/insert
+    -d '{"email":"anyone", "login_id":"host", "name":"jonh", "password":"password", "phone":"1111"}' \
+    http://localhost:3000/server/insert
 
-    curl -X POST \
-    -H "Content-Type: application/json" \
-    -d '{"testcol":"lll"}' \
-    http://localhost:3000/table3/tool/update?id=6
-
-curl -X POST \
-    -H "Content-Type: application/json" \
-    -d '{"testcol":"jjj"}' \
-    http://localhost:3000/table3/tool/delete
+curl http://localhost:3000/server/select

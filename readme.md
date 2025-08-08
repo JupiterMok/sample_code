@@ -5,10 +5,10 @@
 ### 20250730
 
 - [x] 더미 코드 지우기, 테이블 0~2.
-- [ ] user table 만들기, id login_id name password email phone 포함하기.
-- [ ] goods table 만들기, id name price description category 포함하기.
-- [ ] order table 만들기, id user_id goods_id quantity order_date 포함하기.
-- [ ] run.sh 구성하기.
+- [x] user table 만들기, id login_id name password email phone 포함하기.
+- [x] goods table 만들기, id name price description category 포함하기.
+- [x] order table 만들기, id user_id goods_id quantity order_date 포함하기.
+- [x] run.sh 구성하기.
 
 #### 20250730 질문
 
