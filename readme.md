@@ -4,7 +4,7 @@
 
 ### 20250730
 
-- [ ] 구조 파괴문 원래대로 돌려놓기
+- [x] 구조 파괴문 원래대로 돌려놓기
 - [x] 더미 코드 지우기, 테이블 0~2.
 - [x] user table 만들기, id login_id name password email phone 포함하기.
 - [x] goods table 만들기, id name price description category 포함하기.
@@ -13,6 +13,7 @@
 
 #### 20250730 질문
 
+- db를 바꾸고 싶은데 어떻게 해야 하는가?
 - object 선언을 다 구조 파괴문으로 바꿨는데 잘한 일인가?
 - req.body, req.params, req.query 를 함수에 파라미터로 받으면 보안 문제가 있다고 하셨는데 중간에 가로챌 수 있는 것인가?
 

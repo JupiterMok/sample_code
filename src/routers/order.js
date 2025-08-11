@@ -2,7 +2,7 @@ import express, { Router } from 'express';
 
 import instance from '../instance.js';
 import mysqlserver from '../core/mysql.core.js';
-import MariaTestModel from '../models/server_user.js';
+import MariaTestModel from '../models/server_order.js';
 
 const router = express.Router();
 
