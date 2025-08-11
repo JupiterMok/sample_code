@@ -4,6 +4,7 @@
 
 ### 20250730
 
+- [ ] 구조 파괴문 원래대로 돌려놓기
 - [x] 더미 코드 지우기, 테이블 0~2.
 - [x] user table 만들기, id login_id name password email phone 포함하기.
 - [x] goods table 만들기, id name price description category 포함하기.
