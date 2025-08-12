@@ -1,50 +1,48 @@
-import express, { Router } from 'express';
+import express from 'express';
 
-import instance from '../instance.js';
-import mysqlserver from '../core/mysql.core.js';
-import MariaTestModel from '../models/server_good.js';
+import GoodModel from '../models/good.model.js';
 
 const router = express.Router();
 
 router.get('/select', async (req, res) => {
   const { id } = req.query;
 
-  const mysqlTestModel = new MariaTestModel();
-  const connect = await MariaTestModel.openConnectionAsync();
+  const goodModel = new GoodModel();
+  const connect = await GoodModel.openConnectionAsync();
 
-  const result = await mysqlTestModel.findByFilterAsync(connect, { id });
+  const result = await goodModel.findByFilterAsync(connect, { id });
 
-  await MariaTestModel.closeConnectionAsync(connect);
+  await GoodModel.closeConnectionAsync(connect);
 
   res.json(result);
 });
 
 router
   .post('/insert', async (req, res) => {
-    const mysqlTestModel = new MariaTestModel();
-    const connect = await MariaTestModel.openConnectionAsync();
+    const goodModel = new GoodModel();
+    const connect = await GoodModel.openConnectionAsync();
 
     const data = req.body;
-    const id = await mysqlTestModel.insertAsync(connect, data);
+    const id = await goodModel.insertAsync(connect, data);
 
     const index = { id };
 
-    const result = await mysqlTestModel.findByFilterAsync(connect, index);
+    const result = await goodModel.findByFilterAsync(connect, index);
 
-    await MariaTestModel.closeConnectionAsync(connect);
+    await GoodModel.closeConnectionAsync(connect);
 
     res.json(result);
   })
   .post('/update', async (req, res) => {
-    const mysqlTestModel = new MariaTestModel();
-    const connect = await MariaTestModel.openConnectionAsync();
+    const goodModel = new GoodModel();
+    const connect = await GoodModel.openConnectionAsync();
 
     const { id } = req.query;
     const data = req.body;
 
-    const result = await mysqlTestModel.updateByFilterAsync(connect, { id }, data);
+    const result = await goodModel.updateByFilterAsync(connect, { id }, data);
 
-    await MariaTestModel.closeConnectionAsync(connect);
+    await GoodModel.closeConnectionAsync(connect);
 
     let message = { message: 'update is fail' };
     if (result === true) {
@@ -54,14 +52,14 @@ router
     res.json(message);
   })
   .post('/delete', async (req, res) => {
-    const mysqlTestModel = new MariaTestModel();
-    const connect = await MariaTestModel.openConnectionAsync();
+    const goodModel = new GoodModel();
+    const connect = await GoodModel.openConnectionAsync();
 
     const filter = req.body;
 
-    const result = await mysqlTestModel.deleteByFilterAsync(connect, filter);
+    const result = await goodModel.deleteByFilterAsync(connect, filter);
 
-    await MariaTestModel.closeConnectionAsync(connect);
+    await GoodModel.closeConnectionAsync(connect);
 
     let message = { message: 'delete is fail' };
     if (result === true) {
