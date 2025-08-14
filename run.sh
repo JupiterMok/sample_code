@@ -2,33 +2,26 @@
 
 curl -X POST \
     -H "Content-Type: application/json" \
-    -d '{"email":"personOne", "login_id":"one", "name":"bob", "password":"1234", "phone":2345}' \
-    http://localhost:3000/server/users/insert
-
-    curl http://localhost:3000/server/users/select?email=personOne
+    -d '{"login_id":"one", "password":"1234"}' \
+    http://localhost:3000/server/users/login
 
 curl -X POST \
     -H "Content-Type: application/json" \
-    -d '{"name":"box", "price":20000, "description":"triangle", "category":"box"}' \
-    http://localhost:3000/server/goods/insert
-
-    curl http://localhost:3000/server/goods/select?name=box
+    -d '{"login_id":"on", "password":"1234"}' \
+    http://localhost:3000/server/users/login
 
 curl -X POST \
     -H "Content-Type: application/json" \
-    -d '{"user_id":6, "goods_id":8, "quantity":3, "order_date":20250812}' \
-    http://localhost:3000/server/orders/insert
-
-    curl http://localhost:3000/server/orders/select?order_date=20240812
+    -d '{"login_id":"one", "password":"123"}' \
+    http://localhost:3000/server/users/login
 
 curl -X POST \
     -H "Content-Type: application/json" \
-    -d '{"phone":2222}' \
-    http://localhost:3000/server/users/delete
+    -d '{"login_id":"one"}' \
+    http://localhost:3000/server/users/login
 
 curl -X POST \
     -H "Content-Type: application/json" \
-    -d '{"name":"present","price":80,"description":"a little","category":"some"}' \
-    http://localhost:3000/server/goods/update?id=7
+    -d '{"password":"1234"}' \
+    http://localhost:3000/server/users/login
 
-    curl http://localhost:3000/server/goods/select?id=7

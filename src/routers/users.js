@@ -66,5 +66,28 @@ router
       message = { message: 'delete is succeed' };
     }
     res.json(message);
+  })
+  .post('/login', async (req, res) => {
+    const userModel = new UserModel();
+    const connect = await UserModel.openConnectionAsync();
+
+    const { login_id } = req.body;
+
+    const userData = await userModel.findOneByFilterAsync(connect, { login_id });
+
+    await UserModel.closeConnectionAsync(connect);
+
+    if (req.body.login_id === undefined || req.body.password === undefined) {
+      const message = { message: '아이디 또는 비밀번호가 입력되지 않았습니다' };
+      res.json(message);
+    } else if (userData === false) {
+      const message = { message: '아이디를 찾을 수 없습니다. 없는 계정입니다' };
+      res.json(message);
+    } else if (userData.password !== req.body.password) {
+      const message = { message: '비밀번호가 일치하지 않습니다.' };
+      res.json(message);
+    } else {
+      res.json(userData);
+    }
   });
 export default router;
