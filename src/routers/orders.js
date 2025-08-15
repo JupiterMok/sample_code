@@ -23,15 +23,16 @@ router
     const connect = await OrderModel.openConnectionAsync();
 
     const data = req.body;
-    const id = await orderModel.insertAsync(connect, data);
-
-    const index = { id };
-
-    const result = await orderModel.findByFilterAsync(connect, index);
+    const boolean = await orderModel.insertAsync(connect, data);
 
     await OrderModel.closeConnectionAsync(connect);
 
-    res.json(result);
+    let message = { message: 'insert is succeed' };
+    if (boolean === false) {
+      message = { message: 'insert is fail' };
+    }
+
+    res.json(message);
   })
   .post('/update', async (req, res) => {
     const orderModel = new OrderModel();

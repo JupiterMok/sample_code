@@ -23,15 +23,16 @@ router
     const connect = await GoodModel.openConnectionAsync();
 
     const data = req.body;
-    const id = await goodModel.insertAsync(connect, data);
-
-    const index = { id };
-
-    const result = await goodModel.findByFilterAsync(connect, index);
+    const boolean = await goodModel.insertAsync(connect, data);
 
     await GoodModel.closeConnectionAsync(connect);
 
-    res.json(result);
+    let message = { message: 'insert is succeed' };
+    if (boolean === false) {
+      message = { message: 'insert is fail' };
+    }
+
+    res.json(message);
   })
   .post('/update', async (req, res) => {
     const goodModel = new GoodModel();

@@ -2,9 +2,13 @@
 
 ## todo
 
+### 20250812 질문
+
+- security/detect-possible-timing-attacks
+
 ### 20250812
 
-- [ ] insert에서 결과 튕겨져 나오는 부분 삭제
+- [x] insert에서 결과 튕겨져 나오는 부분 삭제
 - [x] users에서 login 구현하기
   - [x] 아이디가 틀리면 해당되는 유저가 없다는 메세지
   - [x] 아이디나 패스워드가 없으면 항목이 비었다는 메세지
