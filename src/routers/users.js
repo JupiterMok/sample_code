@@ -19,20 +19,29 @@ router.get('/select', async (req, res) => {
 
 router
   .post('/insert', async (req, res) => {
-    const userModel = new UserModel();
-    const connect = await UserModel.openConnectionAsync();
-
     const data = req.body;
-    const boolean = await userModel.insertAsync(connect, data);
 
-    await UserModel.closeConnectionAsync(connect);
+    const userModel = new UserModel();
+
+    let connect;
+    let insertedId;
+    let userData;
+    try {
+      connect = await UserModel.openConnectionAsync();
+      insertedId = await userModel.insertAsync(connect, data);
+      userData = await userModel.findOneByFilterAsync(connect, { _id: insertedId });
+    } catch (error) {
+      console.error('Error inserting user:', error);
+    } finally {
+      await UserModel.closeConnectionAsync(connect);
+    }
 
     let message = { message: 'insert is succeed' };
-    if (boolean === false) {
+    if (insertedId === false) {
       message = { message: 'insert is fail' };
     }
 
-    res.json(message);
+    res.json(userData);
   })
   .post('/update', async (req, res) => {
     const userModel = new UserModel();
@@ -69,27 +78,38 @@ router
     res.json(message);
   })
   .post('/login', async (req, res) => {
-    const userModel = new UserModel();
-    const connect = await UserModel.openConnectionAsync();
+    // 1. 선언
+    const { login_id, password } = req.body;
 
-    const { login_id } = req.body;
-
-    const userData = await userModel.findOneByFilterAsync(connect, { login_id });
-
-    await UserModel.closeConnectionAsync(connect);
-
+    // 2. 유효성 검사
     let message;
-
-    if (req.body.login_id === undefined || req.body.password === undefined) {
+    if (!login_id || !password) {
       message = { message: '아이디 또는 비밀번호가 입력되지 않았습니다' };
-    } else if (userData === false) {
-      message = { message: '아이디를 찾을 수 없습니다. 없는 계정입니다' };
-    } else if (userData.password !== req.body.password) {
-      message = { message: '비밀번호가 일치하지 않습니다.' };
-    } else {
-      message = userData;
+      return res.json({ message });
     }
 
-    res.json(message);
+    // 3. 데이터베이스 처리
+    const userModel = new UserModel();
+    let connect;
+    let userData;
+
+    try {
+      connect = await UserModel.openConnectionAsync();
+      userData = await userModel.findOneByFilterAsync(connect, { login_id });
+    } finally {
+      await UserModel.closeConnectionAsync(connect);
+    }
+
+    // 4. 응답처리
+    if (!userData) {
+      message = { message: '아이디를 찾을 수 없습니다. 없는 계정입니다' };
+      return res.json({ message });
+    }
+    if (password !== userData.password) {
+      message = { message: '비밀번호가 일치하지 않습니다.' };
+      return res.json({ message });
+    }
+
+    res.json({ data: userData, message: 'ok' });
   });
 export default router;

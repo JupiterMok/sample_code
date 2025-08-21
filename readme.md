@@ -2,6 +2,10 @@
 
 ## todo
 
+### 20250821
+
+- [ ] bcrypto로 db에 비밀번호를 sha256으로 암호화해서 저장하기
+
 ### 20250812 질문
 
 - security/detect-possible-timing-attacks
