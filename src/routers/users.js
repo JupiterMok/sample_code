@@ -78,17 +78,18 @@ router
 
     await UserModel.closeConnectionAsync(connect);
 
+    let message;
+
     if (req.body.login_id === undefined || req.body.password === undefined) {
-      const message = { message: '아이디 또는 비밀번호가 입력되지 않았습니다' };
-      res.json(message);
+      message = { message: '아이디 또는 비밀번호가 입력되지 않았습니다' };
     } else if (userData === false) {
-      const message = { message: '아이디를 찾을 수 없습니다. 없는 계정입니다' };
-      res.json(message);
+      message = { message: '아이디를 찾을 수 없습니다. 없는 계정입니다' };
     } else if (userData.password !== req.body.password) {
-      const message = { message: '비밀번호가 일치하지 않습니다.' };
-      res.json(message);
+      message = { message: '비밀번호가 일치하지 않습니다.' };
     } else {
-      res.json(userData);
+      message = userData;
     }
+
+    res.json(message);
   });
 export default router;
