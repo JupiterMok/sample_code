@@ -19,7 +19,11 @@ router.get('/select', async (req, res) => {
 
 router
   .post('/insert', async (req, res) => {
-    const data = req.body;
+    const { password } = req.body;
+
+    // bcrypto.hash('sha256', password);
+
+    const data = { ...req.body, password: password };
 
     const userModel = new UserModel();
 
@@ -34,11 +38,6 @@ router
       console.error('Error inserting user:', error);
     } finally {
       await UserModel.closeConnectionAsync(connect);
-    }
-
-    let message = { message: 'insert is succeed' };
-    if (insertedId === false) {
-      message = { message: 'insert is fail' };
     }
 
     res.json(userData);
