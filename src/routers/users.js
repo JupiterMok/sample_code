@@ -1,5 +1,8 @@
+import crypto from 'crypto';
+
 import express from 'express';
 
+import instance from '../instance.js';
 import UserModel from '../models/user.model.js';
 
 const router = express.Router();
@@ -21,9 +24,9 @@ router
   .post('/insert', async (req, res) => {
     const { password } = req.body;
 
-    // bcrypto.hash('sha256', password);
+    const hash = crypto.createHash('sha256').update(password).digest('base64');
 
-    const data = { ...req.body, password: password };
+    const data = { ...req.body, password: hash };
 
     const userModel = new UserModel();
 
@@ -33,9 +36,9 @@ router
     try {
       connect = await UserModel.openConnectionAsync();
       insertedId = await userModel.insertAsync(connect, data);
-      userData = await userModel.findOneByFilterAsync(connect, { _id: insertedId });
+      userData = await userModel.findOneByFilterAsync(connect, { id: insertedId });
     } catch (error) {
-      console.error('Error inserting user:', error);
+      instance.logger.error('Error inserting user:', error);
     } finally {
       await UserModel.closeConnectionAsync(connect);
     }
