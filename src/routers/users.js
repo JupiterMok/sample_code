@@ -11,11 +11,17 @@ router.get('/select', async (req, res) => {
   const filter = req.query;
 
   const userModel = new UserModel();
-  const connect = await UserModel.openConnectionAsync();
 
-  const result = await userModel.findByFilterAsync(connect, filter);
-
-  await UserModel.closeConnectionAsync(connect);
+  let connect;
+  let result;
+  try {
+    connect = await UserModel.openConnectionAsync();
+    result = await userModel.findByFilterAsync(connect, filter);
+  } catch (error) {
+    instance.logger.error('Error: selecting user\n', error);
+  } finally {
+    await UserModel.closeConnectionAsync(connect);
+  }
 
   res.json(result);
 });
@@ -23,9 +29,7 @@ router.get('/select', async (req, res) => {
 router
   .post('/insert', async (req, res) => {
     const { password } = req.body;
-
     const hash = crypto.createHash('sha256').update(password).digest('base64');
-
     const data = { ...req.body, password: hash };
 
     const userModel = new UserModel();
@@ -38,7 +42,7 @@ router
       insertedId = await userModel.insertAsync(connect, data);
       userData = await userModel.findOneByFilterAsync(connect, { id: insertedId });
     } catch (error) {
-      instance.logger.error('Error inserting user:', error);
+      instance.logger.error('Error: inserting user\n', error);
     } finally {
       await UserModel.closeConnectionAsync(connect);
     }
@@ -46,15 +50,32 @@ router
     res.json(userData);
   })
   .post('/update', async (req, res) => {
-    const userModel = new UserModel();
-    const connect = await UserModel.openConnectionAsync();
-
     const filter = req.query;
     const data = req.body;
 
-    const result = await userModel.updateByFilterAsync(connect, filter, data);
+    const { password } = req.body;
 
-    await UserModel.closeConnectionAsync(connect);
+    let hashedData;
+    if (password) {
+      const hashedPassword = crypto.createHash('sha256').update(password).digest('base64');
+      hashedData = { ...req.body, password: hashedPassword };
+    } else {
+      hashedData = data;
+    }
+
+    const userModel = new UserModel();
+
+    let connect;
+    let result;
+    try {
+      connect = await UserModel.openConnectionAsync();
+      // 업데이트 할 때 password가 들어오면 hashing 해줘야 함.
+      result = await userModel.updateByFilterAsync(connect, filter, hashedData);
+    } catch (error) {
+      instance.logger.error('Error: updating user\n', error);
+    } finally {
+      await UserModel.closeConnectionAsync(connect);
+    }
 
     let message = { message: 'update is fail' };
     if (result === true) {
@@ -64,14 +85,20 @@ router
     res.json(message);
   })
   .post('/delete', async (req, res) => {
-    const userModel = new UserModel();
-    const connect = await UserModel.openConnectionAsync();
-
     const filter = req.body;
 
-    const result = await userModel.deleteByFilterAsync(connect, filter);
+    const userModel = new UserModel();
 
-    await UserModel.closeConnectionAsync(connect);
+    let connect;
+    let result;
+    try {
+      connect = await UserModel.openConnectionAsync();
+      result = await userModel.deleteByFilterAsync(connect, filter);
+    } catch (error) {
+      instance.logger.error('Error: deleting user\n', error);
+    } finally {
+      await UserModel.closeConnectionAsync(connect);
+    }
 
     let message = { message: 'delete is fail' };
     if (result === true) {
@@ -87,14 +114,13 @@ router
     let message;
     if (!login_id || !password) {
       message = { message: '아이디 또는 비밀번호가 입력되지 않았습니다' };
-      return res.json({ message });
+      return res.json(message);
     }
 
     // 3. 데이터베이스 처리
     const userModel = new UserModel();
     let connect;
     let userData;
-
     try {
       connect = await UserModel.openConnectionAsync();
       userData = await userModel.findOneByFilterAsync(connect, { login_id });
@@ -105,11 +131,13 @@ router
     // 4. 응답처리
     if (!userData) {
       message = { message: '아이디를 찾을 수 없습니다. 없는 계정입니다' };
-      return res.json({ message });
+      return res.json(message);
     }
-    if (password !== userData.password) {
+
+    const hashingPassword = crypto.createHash('sha256').update(password).digest('base64');
+    if (hashingPassword !== userData.password) {
       message = { message: '비밀번호가 일치하지 않습니다.' };
-      return res.json({ message });
+      return res.json(message);
     }
 
     res.json({ data: userData, message: 'ok' });
