@@ -51,8 +51,6 @@ router
   })
   .post('/update', async (req, res) => {
     const filter = req.query;
-    const data = req.body;
-
     const { password } = req.body;
 
     let hashedData;
@@ -60,7 +58,7 @@ router
       const hashedPassword = crypto.createHash('sha256').update(password).digest('base64');
       hashedData = { ...req.body, password: hashedPassword };
     } else {
-      hashedData = data;
+      hashedData = req.body;
     }
 
     const userModel = new UserModel();
@@ -69,7 +67,6 @@ router
     let result;
     try {
       connect = await UserModel.openConnectionAsync();
-      // 업데이트 할 때 password가 들어오면 hashing 해줘야 함.
       result = await userModel.updateByFilterAsync(connect, filter, hashedData);
     } catch (error) {
       instance.logger.error('Error: updating user\n', error);
@@ -77,7 +74,7 @@ router
       await UserModel.closeConnectionAsync(connect);
     }
 
-    let message = { message: 'update is fail' };
+    let message = { message: 'update is failed' };
     if (result === true) {
       message = { message: 'update is succeed' };
     }
@@ -100,10 +97,11 @@ router
       await UserModel.closeConnectionAsync(connect);
     }
 
-    let message = { message: 'delete is fail' };
+    let message = { message: 'delete is failed' };
     if (result === true) {
       message = { message: 'delete is succeed' };
     }
+
     res.json(message);
   })
   .post('/login', async (req, res) => {

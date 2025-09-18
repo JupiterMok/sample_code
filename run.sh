@@ -2,5 +2,5 @@
 
 curl -X POST \
     -H "Content-Type: application/json" \
-    -d '{"login_id":"herry"}' \
-    http://localhost:3000/server/users/update?id=9
+    -d '{"email":"personOne", "login_id":"one", "name":"bob", "password":"1234", "phone":2345}' \
+    http://localhost:3000/server/users/insert
